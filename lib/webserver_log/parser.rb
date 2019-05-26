@@ -1,6 +1,6 @@
 require "set"
 
-module WebserverLog
+class WebserverLog
   class Parser
     attr_reader :stats
 
