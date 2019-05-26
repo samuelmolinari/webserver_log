@@ -1,6 +1,26 @@
 RSpec.describe WebserverLog::CommandLine do
   subject { described_class.new }
 
+  describe "default options" do
+    before do
+      ARGV.replace ["spec/fixtures/sample.log"]
+    end
+
+    let(:expected_output) do
+      <<-EOF
+/cats 4 visits
+/dogs 3 visits
+
+/dogs 3 unique views
+/cats 2 unique views
+      EOF
+    end
+
+    it "outputs pages with unique views in descending order" do
+      expect { subject.execute }.to output(expected_output).to_stdout
+    end
+  end
+
   describe  "--help" do
     before do
       ARGV.replace ["--help"]
@@ -18,6 +38,10 @@ OPTIONS:
   -v, --views [total|unique]:
     total: List pages by most views
     unique: List pages by most unique views
+
+  -f, --format:
+    With the -v option, you can choose the output format of the ouput
+    default: "%{page} %{value}"
       EOF
     end
 
@@ -66,6 +90,29 @@ OPTIONS:
       it "outputs pages with total views in descending order" do
         expect { subject.execute }.to output(expected_output).to_stdout
       end
+
+      context "with custom format" do
+        before do
+          ARGV.replace [
+            "spec/fixtures/sample.log",
+            "--views",
+            "total",
+            "--format",
+            "Page %{page} has %{value} visits"
+          ]
+        end
+
+        let(:expected_output) do
+          <<-EOF
+Page /cats has 4 visits
+Page /dogs has 3 visits
+          EOF
+        end
+
+        it "outputs pages in given format" do
+          expect { subject.execute }.to output(expected_output).to_stdout
+        end
+      end
     end
 
     context "with unique argument" do
@@ -82,6 +129,29 @@ OPTIONS:
 
       it "outputs pages with unique views in descending order" do
         expect { subject.execute }.to output(expected_output).to_stdout
+      end
+
+      context "with custom format" do
+        before do
+          ARGV.replace [
+            "spec/fixtures/sample.log",
+            "--views",
+            "unique",
+            "--format",
+            "Page %{page} has %{value} unique views"
+          ]
+        end
+
+        let(:expected_output) do
+          <<-EOF
+Page /dogs has 3 unique views
+Page /cats has 2 unique views
+          EOF
+        end
+
+        it "outputs pages in given format" do
+          expect { subject.execute }.to output(expected_output).to_stdout
+        end
       end
     end
   end

@@ -4,13 +4,15 @@ class WebserverLog
   class CommandLine
     OPTIONS = [
       ["--help", "-h", GetoptLong::NO_ARGUMENT],
-      ["--views", "-v", GetoptLong::REQUIRED_ARGUMENT]
+      ["--views", "-v", GetoptLong::REQUIRED_ARGUMENT],
+      ["--format", "-f", GetoptLong::REQUIRED_ARGUMENT]
     ].freeze
 
     def initialize
       @path = ARGV[0]
       @help = false
       @views = nil
+      @format = "%{page} %{value}"
 
       parse_options(GetoptLong.new(*OPTIONS))
     end
@@ -18,22 +20,18 @@ class WebserverLog
     def execute
       return output_manual if help?
 
-      output_logs
+      output
     end
 
     private
 
-    def output_logs
-      puts logs.map { |log| "#{log[:page]} #{log[:value]}" }
-    end
-
-    def logs
+    def output
       webserver_log = WebserverLog.new(@path)
 
       if order_by?(:total)
-        webserver_log.most_views
+        output_logs(webserver_log.most_views, @format)
       elsif order_by?(:unique)
-        webserver_log.most_unique_views
+        output_logs(webserver_log.most_unique_views, @format)
       else
         raise Error, "option `--views' only accept `total' or `unique' as argument"
       end
@@ -46,6 +44,8 @@ class WebserverLog
             @help = true
           when "--views"
             @views = arg
+          when "--format"
+            @format = arg
         end
       end
     end
@@ -56,6 +56,12 @@ class WebserverLog
 
     def help?
       @help
+    end
+
+    def output_logs(logs, format)
+      logs.each do |log|
+        puts Formatter.strflog(log, format)
+      end
     end
 
     def output_manual
@@ -70,6 +76,10 @@ OPTIONS:
   -v, --views [total|unique]:
     total: List pages by most views
     unique: List pages by most unique views
+
+  -f, --format:
+    With the -v option, you can choose the output format of the ouput
+    default: "%{page} %{value}"
       EOF
     end
   end
