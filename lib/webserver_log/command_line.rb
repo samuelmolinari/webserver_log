@@ -29,7 +29,7 @@ class WebserverLog
     end
 
     def webserver_log
-      @webserver_log ||= WebserverLog.new(options.path)
+      @webserver_log ||= WebserverLog.new(Parser.new(options.path))
     end
 
     def output_visits(format=options.format)

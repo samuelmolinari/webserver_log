@@ -6,8 +6,8 @@ require "webserver_log/formatter"
 class WebserverLog
   class Error < StandardError; end
 
-  def initialize(path)
-    @stats = Parser.new(path).stats
+  def initialize(parser)
+    @stats = parser.stats
   end
 
   def visits

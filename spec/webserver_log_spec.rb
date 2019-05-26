@@ -1,5 +1,6 @@
 RSpec.describe WebserverLog do
-  subject { described_class.new("spec/fixtures/sample.log") }
+  subject { described_class.new(parser) }
+  let(:parser) { WebserverLog::Parser.new("spec/fixtures/sample.log") }
 
   it "has a version number" do
     expect(WebserverLog::VERSION).not_to be nil
