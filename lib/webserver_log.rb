@@ -10,11 +10,11 @@ class WebserverLog
     @stats = Parser.new(path).stats
   end
 
-  def most_views
+  def visits
     order_page_by(:total)
   end
 
-  def most_unique_views
+  def unique_views
     order_page_by(:unique)
   end
 

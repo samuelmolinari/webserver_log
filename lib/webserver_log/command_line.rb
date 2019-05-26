@@ -4,14 +4,14 @@ class WebserverLog
   class CommandLine
     OPTIONS = [
       ["--help", "-h", GetoptLong::NO_ARGUMENT],
-      ["--views", "-v", GetoptLong::REQUIRED_ARGUMENT],
+      ["--only", "-o", GetoptLong::REQUIRED_ARGUMENT],
       ["--format", "-f", GetoptLong::REQUIRED_ARGUMENT]
     ].freeze
 
     def initialize
       @path = ARGV[0]
       @help = false
-      @views = nil
+      @only = nil
       @format = "%{page} %{value}"
 
       parse_options(GetoptLong.new(*OPTIONS))
@@ -28,12 +28,16 @@ class WebserverLog
     def output
       webserver_log = WebserverLog.new(@path)
 
-      if order_by?(:total)
-        output_logs(webserver_log.most_views, @format)
-      elsif order_by?(:unique)
-        output_logs(webserver_log.most_unique_views, @format)
+      if only?(:visits)
+        output_logs(webserver_log.visits, @format)
+      elsif only?(:unique_views)
+        output_logs(webserver_log.unique_views, @format)
+      elsif default?
+        output_logs(webserver_log.visits, "%{page} %{value} visits")
+        puts
+        output_logs(webserver_log.unique_views, "%{page} %{value} unique views")
       else
-        raise Error, "option `--views' only accept `total' or `unique' as argument"
+        raise Error, "option `--only' only accept `visits' or `unique_views' as argument"
       end
     end
 
@@ -42,16 +46,20 @@ class WebserverLog
         case opt
           when "--help"
             @help = true
-          when "--views"
-            @views = arg
+          when "--only"
+            @only = arg
           when "--format"
             @format = arg
         end
       end
     end
 
-    def order_by?(stat)
-      @views == stat.to_s
+    def only?(stat)
+      @only == stat.to_s
+    end
+
+    def default?
+      @only.nil?
     end
 
     def help?
@@ -73,12 +81,12 @@ OPTIONS:
   -h, --help:
     Show help
 
-  -v, --views [total|unique]:
-    total: List pages by most views
-    unique: List pages by most unique views
+  -o, --only [visits|unique_views]:
+    visits: List pages by most views
+    unique_views: List pages by most unique views
 
   -f, --format:
-    With the -v option, you can choose the output format of the ouput
+    With the -o option, you can choose the output format of the ouput
     default: "%{page} %{value}"
       EOF
     end

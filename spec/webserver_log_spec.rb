@@ -5,18 +5,18 @@ RSpec.describe WebserverLog do
     expect(WebserverLog::VERSION).not_to be nil
   end
 
-  describe "#most_views" do
+  describe "#visits" do
     it "returns pages ordered by total views" do
-      expect(subject.most_views).to eq([
+      expect(subject.visits).to eq([
         { page: "/cats", value: 4 },
         { page: "/dogs", value: 3 }
       ])
     end
   end
 
-  describe "#most_unique_views" do
+  describe "#unique_views" do
     it "returns pages ordered by unique views" do
-      expect(subject.most_unique_views).to eq([
+      expect(subject.unique_views).to eq([
         { page: "/dogs", value: 3 },
         { page: "/cats", value: 2 }
       ])

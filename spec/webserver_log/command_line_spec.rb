@@ -35,12 +35,12 @@ OPTIONS:
   -h, --help:
     Show help
 
-  -v, --views [total|unique]:
-    total: List pages by most views
-    unique: List pages by most unique views
+  -o, --only [visits|unique_views]:
+    visits: List pages by most views
+    unique_views: List pages by most unique views
 
   -f, --format:
-    With the -v option, you can choose the output format of the ouput
+    With the -o option, you can choose the output format of the ouput
     default: "%{page} %{value}"
       EOF
     end
@@ -50,34 +50,35 @@ OPTIONS:
     end
   end
 
-  describe "--views" do
+
+  describe "--only" do
     context "without arguments" do
       before do
-        ARGV.replace ["spec/fixtures/sample.log", "--views"]
+        ARGV.replace ["spec/fixtures/sample.log", "--only"]
       end
 
       it "raises an error" do
         expect { subject.execute }.to raise_error(
-          "option `--views' requires an argument"
+          "option `--only' requires an argument"
         )
       end
     end
 
     context "with invalid argument" do
       before do
-        ARGV.replace ["spec/fixtures/sample.log", "--views", "undefined"]
+        ARGV.replace ["spec/fixtures/sample.log", "--only", "undefined"]
       end
 
       it "raises an error" do
         expect { subject.execute }.to raise_error(
-          "option `--views' only accept `total' or `unique' as argument"
+          "option `--only' only accept `visits' or `unique_views' as argument"
         )
       end
     end
 
     context "with total argument" do
       before do
-        ARGV.replace ["spec/fixtures/sample.log", "--views", "total"]
+        ARGV.replace ["spec/fixtures/sample.log", "--only", "visits"]
       end
 
       let(:expected_output) do
@@ -95,8 +96,8 @@ OPTIONS:
         before do
           ARGV.replace [
             "spec/fixtures/sample.log",
-            "--views",
-            "total",
+            "--only",
+            "visits",
             "--format",
             "Page %{page} has %{value} visits"
           ]
@@ -117,7 +118,7 @@ Page /dogs has 3 visits
 
     context "with unique argument" do
       before do
-        ARGV.replace ["spec/fixtures/sample.log", "--views", "unique"]
+        ARGV.replace ["spec/fixtures/sample.log", "--only", "unique_views"]
       end
 
       let(:expected_output) do
@@ -135,8 +136,8 @@ Page /dogs has 3 visits
         before do
           ARGV.replace [
             "spec/fixtures/sample.log",
-            "--views",
-            "unique",
+            "--only",
+            "unique_views",
             "--format",
             "Page %{page} has %{value} unique views"
           ]
