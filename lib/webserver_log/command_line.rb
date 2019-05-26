@@ -48,7 +48,7 @@ class WebserverLog
 
     def output_logs(logs, format)
       logs.each do |log|
-        puts Formatter.strflog(log, format)
+        puts format % log
       end
     end
 
