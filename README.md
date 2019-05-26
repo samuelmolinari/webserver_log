@@ -22,6 +22,23 @@ Or install it yourself as:
 
 ## Usage
 
+```
+bundle exec bin/parser log_file [OPTIONS]
+```
+
+OPTIONS:
+
+  `-h`, `--help`:
+    Show help
+
+  `-o`, `--only` [`visits`|`unique_views`]:
+    `visits`: List pages by most views
+    `unique_views`: List pages by most unique views
+
+  `-f`, `--format`:
+    With the `-o` option, you can choose the output format of the ouput
+    default: `"%{page} %{value}"`
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
