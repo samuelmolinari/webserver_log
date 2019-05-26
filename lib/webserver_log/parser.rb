@@ -21,8 +21,14 @@ class WebserverLog
     end
 
     def analyse_line(line)
+      raise(Error, "Logs should have the format '%{page} %{ip}'") unless valid?(line)
+
       page, ip_address = line.split(' ')
       update_page_stats(page, ip_address)
+    end
+
+    def valid?(line)
+      line.match? /.+? .+?/
     end
 
     def update_page_stats(page, ip_address)
