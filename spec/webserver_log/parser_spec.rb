@@ -3,19 +3,21 @@ RSpec.describe WebserverLog::Parser do
 
   describe "#stats" do
     it "maps views stats to each page" do
-      expect(subject.stats).to include(
-        '/cats' => {
-          views: {
-            total: 4,
-            unique: 2
-          }
-        },
-        '/dogs' => {
-          views: {
-            total: 3,
-            unique: 3
-          }
-        }
+      expect(subject.stats).to match(
+        hash_including(
+          '/cats' => hash_including(
+            views: hash_including(
+              total: 4,
+              unique: 2
+            )
+          ),
+          '/dogs' => hash_including(
+            views: hash_including(
+              total: 3,
+              unique: 3
+            )
+          )
+        )
       )
     end
   end
