@@ -2,68 +2,48 @@ require "getoptlong"
 
 class WebserverLog
   class CommandLine
-    OPTIONS = [
-      ["--help", "-h", GetoptLong::NO_ARGUMENT],
-      ["--only", "-o", GetoptLong::REQUIRED_ARGUMENT],
-      ["--format", "-f", GetoptLong::REQUIRED_ARGUMENT]
-    ].freeze
-
     def initialize
-      @path = ARGV[0]
-      @help = false
-      @only = nil
-      @format = "%{page} %{value}"
-
-      parse_options(GetoptLong.new(*OPTIONS))
+      @options = Options.new
     end
 
     def execute
-      return output_manual if help?
+      return output_manual if options.help?
 
       output
     end
 
     private
 
-    def output
-      webserver_log = WebserverLog.new(@path)
+    attr_reader :options
 
-      if only?(:visits)
-        output_logs(webserver_log.visits, @format)
-      elsif only?(:unique_views)
-        output_logs(webserver_log.unique_views, @format)
-      elsif default?
-        output_logs(webserver_log.visits, "%{page} %{value} visits")
-        puts
-        output_logs(webserver_log.unique_views, "%{page} %{value} unique views")
+    def output
+      if options.default?
+        output_all
+      elsif options.only?(:visits)
+        output_visits
+      elsif options.only?(:unique_views)
+        output_unique_views
       else
         raise Error, "option `--only' only accept `visits' or `unique_views' as argument"
       end
     end
 
-    def parse_options(options)
-      options.each do |opt, arg|
-        case opt
-          when "--help"
-            @help = true
-          when "--only"
-            @only = arg
-          when "--format"
-            @format = arg
-        end
-      end
+    def webserver_log
+      @webserver_log ||= WebserverLog.new(options.path)
     end
 
-    def only?(stat)
-      @only == stat.to_s
+    def output_visits(format=options.format)
+      output_logs(webserver_log.visits, format)
     end
 
-    def default?
-      @only.nil?
+    def output_unique_views(format=options.format)
+      output_logs(webserver_log.unique_views, format)
     end
 
-    def help?
-      @help
+    def output_all
+      output_visits("%{page} %{value} visits")
+      puts
+      output_unique_views("%{page} %{value} unique views")
     end
 
     def output_logs(logs, format)
@@ -89,6 +69,52 @@ OPTIONS:
     With the -o option, you can choose the output format of the ouput
     default: "%{page} %{value}"
       EOF
+    end
+
+    class Options
+      OPTIONS = [
+        ["--help", "-h", GetoptLong::NO_ARGUMENT],
+        ["--only", "-o", GetoptLong::REQUIRED_ARGUMENT],
+        ["--format", "-f", GetoptLong::REQUIRED_ARGUMENT]
+      ].freeze
+
+      attr_reader :path, :format
+
+      def initialize
+        @path = ARGV[0]
+        @help = false
+        @only = nil
+        @format = "%{page} %{value}"
+
+        parse_options(GetoptLong.new(*OPTIONS))
+      end
+
+      def only?(stat)
+        @only == stat.to_s
+      end
+
+      def default?
+        @only.nil?
+      end
+
+      def help?
+        @help
+      end
+    
+      private
+
+      def parse_options(options)
+        options.each do |opt, arg|
+          case opt
+            when "--help"
+              @help = true
+            when "--only"
+              @only = arg
+            when "--format"
+              @format = arg
+          end
+        end
+      end
     end
   end
 end
