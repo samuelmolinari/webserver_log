@@ -72,6 +72,7 @@ OPTIONS:
     end
 
     class Options
+      DEFAULT_FORMAT = "%{page} %{value}".freeze
       OPTIONS = [
         ["--help", "-h", GetoptLong::NO_ARGUMENT],
         ["--only", "-o", GetoptLong::REQUIRED_ARGUMENT],
@@ -84,7 +85,7 @@ OPTIONS:
         @path = ARGV[0]
         @help = false
         @only = nil
-        @format = "%{page} %{value}"
+        @format = DEFAULT_FORMAT
 
         parse_options(GetoptLong.new(*OPTIONS))
       end
