@@ -23,7 +23,7 @@ Or install it yourself as:
 ## Usage
 
 ```
-bundle exec bin/parser log_file [OPTIONS]
+bundle exec bin/parser webserver.log [OPTIONS]
 ```
 
 OPTIONS:
