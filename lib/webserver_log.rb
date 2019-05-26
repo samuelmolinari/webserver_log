@@ -9,17 +9,23 @@ class WebserverLog
   end
 
   def most_views
-    stats
-      .map { |page, page_stats| {page: page, total_views: total_views(page_stats)} }
-      .sort { |log| log[:total_views] }
-      .reverse
+    order_page_by(:total)
+  end
+
+  def most_unique_views
+    order_page_by(:unique)
   end
 
   private
 
   attr_reader :stats
 
-  def total_views(page_stats)
-    page_stats[:views][:total]
+  def order_page_by(stat)
+    stats
+      .map do |page, page_stats|
+        {page: page, value: page_stats[:views][stat]}
+      end
+      .sort_by { |log| log[:value] }
+      .reverse
   end
 end
