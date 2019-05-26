@@ -1,5 +1,6 @@
 require "webserver_log/version"
 require "webserver_log/parser"
+require "webserver_log/command_line"
 
 class WebserverLog
   class Error < StandardError; end

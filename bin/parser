@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+require "webserver_log"
+
+WebserverLog::CommandLine.new.execute
